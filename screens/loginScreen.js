@@ -1,9 +1,47 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; 
+import { useNavigation } from '@react-navigation/native';
+import axios from "axios"; 
 
 const loginScreen = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const navigation = useNavigation(); 
+  useEffect(()=>{
+    const checkLoginStatus = async()=>{
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+        if (token) {
+          navigation.replace("homeScreen");
+        }
+
+      }
+      catch (err){
+        console.log("error message", err);
+      }
+    };
+    checkLoginStatus();
+  }, []);
+  const handleLogin = ()=>{
+    const user = {
+      email: email, password: password, 
+    };
+    axios
+    .post('http://10.95.8.242:8081/login', user)
+    .then((response)=>{
+      console.log(response);
+      const token = response.data.token;
+      AsyncStorage.setItem("authToken", token);
+      navigation.replace("homeScreen");
+    })
+    .catch((error)=>{
+      Alert.alert("loginError", "invalid email");
+      console.log(error);
+
+    })
+  }
+
 
   return (
     <View style={styles.container}>
@@ -11,6 +49,8 @@ const loginScreen = () => {
 
       <View style={styles.inputContainer}>
         <TextInput
+          value = {email}
+          onChangeText = {(text)=>setEmail(text)}
           style={styles.input}
           placeholder="enter your email"
         />
@@ -18,6 +58,9 @@ const loginScreen = () => {
 
       <View style={styles.inputContainer}>
         <TextInput
+          value = {password}
+          onChangeText={(text)=>setPassword(text)}
+          
           style={styles.input}
           placeholder="enter your password"
           secureTextEntry

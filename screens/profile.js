@@ -1,14 +1,56 @@
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, ScrollView, Image, TextInput, TouchableOpacity, ViewComponent } from 'react-native';
+import React, { userLayoutEffect, useEffect, useContext, useState, useLayoutEffect} from "react";
+import { useNavigation } from '@react-navigation/native';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 
-const ProfileScreen = () => {
-  const user = {
-    name: 'Jane Doe',
-    username: '@janedoe',
-    location: 'san fran',
-    joinDate: 'joined: January 2024',
-    profileImage: 'https://via.placeholderurl.com/',
+const profile = () => {
+  const {userId, setUserId } = useContext(UserType);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigation =  useNavigation();
+  useLayoutEffect(()=>{
+    navigation.setOptions({
+      headerTitle: "", headerStyle: {backgroundColor: "#00CED1"}, 
+      headerLeft: ()=>(
+        <Image style={{height: 120, width: 140, resizeMode: "contain"}} source={{uri: "https://assets.stickpng.com/thumbs/580b57fcd9996e24bc43c518.png"}}/>
+
+      ),
+      headerRight: ()=>(
+        <View style={{flexDirection: "row", alignItems: "center", gap: 6, marginRight: 12}}>
+          <Ionicons name="notifications-outline" size={24} color="black" />
+          <AntDesign name="search1" size= {24} color="black"/>
+        </View>
+      )
+
+    })
+  })
+  
+const [user, setUser] = useState();
+useEffect(()=>{
+  const fetchUserProfile = async()=>{
+    try {
+      const response = await axios.get(
+        `http://localhost:8000/profile/${userId}`
+      );
+      const {user} = response.data;
+      setUser(user);
+
+
+    }
+    catch(error){
+      console.log("error", error);
+    }
   };
+  fetchUserProfile();
+},[]);
+const logout = ()=>{
+  clearAuthToken();
+};
+const clearAuthToken = async()=>{
+  await AsyncStorage.removeItem("authToken");
+  console.log("auth token cleared");
+  navigation.replace("loginScreen");
+};
 
   return (
     <SafeAreaView style={styles.container}>
@@ -164,4 +206,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;
+export default profile;

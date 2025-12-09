@@ -1,4 +1,4 @@
-const mongoose = require(mongoose);
+const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
         default: false
     },
     verificationToken: String,
-    address: [
+    addresses: [
         {
             name: String,
             mobileNumber: String,
@@ -41,4 +41,4 @@ const userSchema = new mongoose.Schema({
 });
 
 const User = mongoose.model("User", userSchema);
-module.exports = user
+module.exports = User;

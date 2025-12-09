@@ -1,16 +1,41 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, {useState} from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
 const registerScreen = () => {
-  const navigation = useNavigation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
 
+  const navigation = useNavigation();
+  const handleRegister = ()=>{
+    const user = {
+      name: name, email: email, password: password
+    }; 
+  axios
+  .post('http://10.95.8.242:8081/register', user)
+  .then((response)=>{
+    console.log(response);
+    Alert.alert('Registration successful', 'you have been registered successfully');
+    setName("");
+    setEmail("");
+    setPassword("");
+  })
+  .catch((error)=>{
+    Alert.alert("registration error", "an error occured while registering");
+    console.log("registration failed", error);
+  });
+
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Create Account</Text>
 
       <View style={styles.inputContainer}>
         <TextInput
+          value = {name}
+          onChangeText={(text)=>setName(text)}
           style={styles.input}
           placeholder="input your name"
         />
@@ -18,6 +43,8 @@ const registerScreen = () => {
 
       <View style={styles.inputContainer}>
         <TextInput
+          value={email}
+          onChangeText={(text)=>setEmail(text)}
           style={styles.input}
           placeholder="input your email"
         />
@@ -25,13 +52,15 @@ const registerScreen = () => {
 
       <View style={styles.inputContainer}>
         <TextInput
+          value={password}
+          onChangeText={(text)=>setPassword(text)}
           style={styles.input}
           placeholder="input your Password"
           secureTextEntry
         />
       </View>
 
-      <TouchableOpacity style={styles.signUpButton}>
+      <TouchableOpacity style={styles.signUpButton} onPress={handleRegister}>
         <Text style={styles.signUpButtonText}>Sign Up</Text>
       </TouchableOpacity>
 
